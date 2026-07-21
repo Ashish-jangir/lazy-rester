@@ -3,7 +3,7 @@
 #include <string>
 namespace lazy_rester {
 
-enum class HttpMethod { Get, Post, Put, Patch, Delete, Option };
+enum class HttpMethod { Get, Post, Put, Patch, Delete, Options, Head };
 
 class HttpRequest {
   public:

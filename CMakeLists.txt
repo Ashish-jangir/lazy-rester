@@ -42,7 +42,7 @@ include(FetchContent)
 FetchContent_Declare(
   curl
   GIT_REPOSITORY https://github.com/curl/curl.git
-  GIT_TAG curl-8_20_0
+  GIT_TAG curl-8_21_0
 )
 FetchContent_MakeAvailable(curl)
 # first run this command if you are in debian:
@@ -52,7 +52,7 @@ FetchContent_MakeAvailable(curl)
 FetchContent_Declare(
   ftxui
   GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI
-  GIT_TAG v7.0.0
+  GIT_TAG v7.0.1
 )
 FetchContent_MakeAvailable(ftxui)
 

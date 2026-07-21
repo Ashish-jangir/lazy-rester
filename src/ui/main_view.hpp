@@ -8,10 +8,8 @@
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/screen/color.hpp>
 #include <ftxui/screen/screen.hpp>
-#include <iostream>
 #include <lazy_rester/http_request.hpp>
 #include <memory>
-#include <vector>
 
 namespace lazy_rester {
 
@@ -20,6 +18,10 @@ static std::string popup_message;
  * @brief Show main ui of the application
  */
 class MainView {
+  private:
+    std::shared_ptr<CurlHttpClient> client_;
+    std::shared_ptr<FileLogger> logger_;
+
   public:
     /**
      * @brief This method is used for initializing the main ui of the application

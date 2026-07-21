@@ -1,5 +1,7 @@
+#include "../logger/file_logger.hpp"
 #include <lazy_rester/http_request.hpp>
 #include <lazy_rester/http_response.hpp>
+#include <memory>
 
 namespace lazy_rester {
 
@@ -7,6 +9,9 @@ namespace lazy_rester {
  * @brief This is http client to make http request
  */
 class CurlHttpClient {
+  private:
+    std::shared_ptr<FileLogger> logger_;
+
   public:
     /**
      * @brief make get request
@@ -16,6 +21,11 @@ class CurlHttpClient {
      * @param request is all the parameter like url, headers and query parameters.
      * @return HttpResponse that contains response body, status codes and headers.
      */
+    CurlHttpClient(std::shared_ptr<FileLogger> logger) : logger_(logger) {}
     HttpResponse sendGetRequest(HttpRequest &request);
+
+    // Callback function for writing response data
+    static size_t writeCallback(void *contents, size_t size, size_t nmemb, void *userp);
+    static size_t headerCallback(char *buffer, size_t size, size_t nitems, void *userdata);
 };
 } // namespace lazy_rester
