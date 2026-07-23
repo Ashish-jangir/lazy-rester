@@ -2,12 +2,19 @@
 #include "curl/curl.h"
 
 lazy_rester::HttpResponse
-lazy_rester::CurlHttpClient::sendGetRequest(lazy_rester::HttpRequest &request) {
+lazy_rester::CurlHttpClient::sendRequest(lazy_rester::HttpRequest &request) {
     CURL *curl = curl_easy_init();
+    struct curl_slist *list = nullptr;
+    for (const auto &header : request.headers_) {
+        std::string header_string = header.first + ": " + header.second;
+        list = curl_slist_append(list, header_string.c_str());
+    }
     lazy_rester::HttpResponse http_response;
     std::string response_string;
     curl_easy_setopt(curl, CURLOPT_URL, request.url_.c_str());
-    curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, toString(request.method_).data());
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, request.body_.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &http_response.body);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, headerCallback);
@@ -27,7 +34,6 @@ lazy_rester::CurlHttpClient::sendGetRequest(lazy_rester::HttpRequest &request) {
     }
     return http_response;
 }
-
 size_t lazy_rester::CurlHttpClient::writeCallback(void *contents, size_t size, size_t nmemb,
                                                   void *userp) {
     static_cast<std::string *>(userp)->append(static_cast<char *>(contents), size * nmemb);

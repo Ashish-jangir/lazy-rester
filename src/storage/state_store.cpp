@@ -1,4 +1,5 @@
 #include "state_store.hpp"
+#include "../utils/utility.hpp"
 #include <fstream>
 
 nlohmann::json lazy_rester::StateStore::createRequestJson(lazy_rester::HttpRequest &request) {
@@ -9,9 +10,7 @@ nlohmann::json lazy_rester::StateStore::createRequestJson(lazy_rester::HttpReque
     request_json["label_name"] = request.label_name_;
     request_json["headers"] = nlohmann::json::array();
     for (const auto &[key, value] : request.headers_) {
-        nlohmann::json header_json;
-        header_json[key] = value;
-        request_json["headers"].push_back(header_json);
+        request_json["headers"].push_back(key + ": " + value);
     }
     return request_json;
 }
@@ -43,10 +42,9 @@ lazy_rester::AppStatePtr lazy_rester::StateStore::loadStateFromFile() {
         request.method_ = request_json["method"];
         request.body_ = request_json["body"];
         request.label_name_ = request_json["label_name"];
-        for (const auto &header_json : request_json["headers"]) {
-            for (auto it = header_json.begin(); it != header_json.end(); ++it) {
-                request.headers_[it.key()] = it.value();
-            }
+        for (const std::string header_json : request_json["headers"]) {
+            auto [key, value] = lazy_rester::Utility::parseHeaderLine(header_json);
+            request.headers_[key] = value;
         }
         state->requests_.push_back(request);
     }

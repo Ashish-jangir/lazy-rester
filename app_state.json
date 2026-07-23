@@ -1,0 +1,54 @@
+{
+    "current_open_request": {
+        "body": "",
+        "headers": [],
+        "label_name": "Request 1",
+        "method": 0,
+        "url": "https://8161-2405-201-403c-b869-6969-2530-920d-5ea.ngrok-free.app"
+    },
+    "dirty": true,
+    "requests": [
+        {
+            "body": "{ \"name\": \"Ashish Jangir\"}",
+            "headers": [],
+            "label_name": "get users",
+            "method": 0,
+            "url": "https://8161-2405-201-403c-b869-6969-2530-920d-5ea.ngrok-free.app/api/users"
+        },
+        {
+            "body": "{ \"name\": \"Ashish Jangir\"}",
+            "headers": [
+                "Content-Type: application/json"
+            ],
+            "label_name": "post users",
+            "method": 1,
+            "url": "https://8161-2405-201-403c-b869-6969-2530-920d-5ea.ngrok-free.app/api/users"
+        },
+        {
+            "body": "{ \"name\": \"Ashish Jangir\"}",
+            "headers": [],
+            "label_name": "delete tasks",
+            "method": 4,
+            "url": "https://8161-2405-201-403c-b869-6969-2530-920d-5ea.ngrok-free.app/api/tasks"
+        },
+        {
+            "body": "{ \"title\": \"Updated in my rest client\", \"description\": \"Create Dashboard api to get all the required data to show on dashbaord.\", \"status\": \"IN_DEVELOPMENT\", \"priority\": \"High\", \"dueDate\": \"2026-05-25\", \"completed\": false, \"projectId\": 1, \"assignedUserId\": 2}",
+            "headers": [
+                "Content-Type: application/json"
+            ],
+            "label_name": "put tasks",
+            "method": 2,
+            "url": "https://8161-2405-201-403c-b869-6969-2530-920d-5ea.ngrok-free.app/api/tasks"
+        },
+        {
+            "body": "{\"priority\": \"High\"}",
+            "headers": [
+                "Content-Type: application/json"
+            ],
+            "label_name": "patch tasks",
+            "method": 3,
+            "url": "https://8161-2405-201-403c-b869-6969-2530-920d-5ea.ngrok-free.app/api/tasks"
+        }
+    ],
+    "selected_request_index": 1
+}

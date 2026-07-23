@@ -22,6 +22,7 @@ add_executable(
   src/storage/state_store.cpp
   src/app/application.cpp
   src/logger/file_logger.cpp
+  src/utils/utility.cpp
 )
 
 target_compile_definitions(

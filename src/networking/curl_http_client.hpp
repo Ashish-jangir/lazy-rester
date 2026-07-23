@@ -22,7 +22,7 @@ class CurlHttpClient {
      * @return HttpResponse that contains response body, status codes and headers.
      */
     CurlHttpClient(std::shared_ptr<FileLogger> logger) : logger_(logger) {}
-    HttpResponse sendGetRequest(HttpRequest &request);
+    HttpResponse sendRequest(HttpRequest &request);
 
     // Callback function for writing response data
     static size_t writeCallback(void *contents, size_t size, size_t nmemb, void *userp);
