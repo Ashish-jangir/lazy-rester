@@ -4,6 +4,15 @@
 
 LazyRESTer is a keyboard-driven TUI (Terminal User Interface) for testing and exploring HTTP APIs. It combines the speed of terminal workflows with the convenience of modern API clients, allowing developers to create, organize, execute, and inspect HTTP requests without leaving their terminal.
 
+## Prerequisites (Ubuntu)
+
+These package should be pre-installed in system to compile the project
+sudo apt install \
+    build-essential \
+    cmake \
+    libcurl4-openssl-dev \
+    libssl-dev
+
 ## Features
 
 ### 🚀 Fast Keyboard-Driven Workflow

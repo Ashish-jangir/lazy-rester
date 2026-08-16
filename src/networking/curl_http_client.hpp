@@ -1,3 +1,4 @@
+#pragma once
 #include "../logger/file_logger.hpp"
 #include <lazy_rester/http_request.hpp>
 #include <lazy_rester/http_response.hpp>
@@ -13,6 +14,7 @@ class CurlHttpClient {
     std::shared_ptr<FileLogger> logger_;
 
   public:
+    CurlHttpClient(std::shared_ptr<FileLogger> logger) : logger_(logger) {}
     /**
      * @brief make get request
      *
@@ -21,7 +23,6 @@ class CurlHttpClient {
      * @param request is all the parameter like url, headers and query parameters.
      * @return HttpResponse that contains response body, status codes and headers.
      */
-    CurlHttpClient(std::shared_ptr<FileLogger> logger) : logger_(logger) {}
     HttpResponse sendRequest(HttpRequest &request);
 
     // Callback function for writing response data

@@ -17,7 +17,9 @@ add_executable(
     LazyRESTer
   src/main.cpp
   src/ui/main_view.cpp
-  src/ui/request_list.cpp
+  src/ui/request_explorer.cpp
+  src/ui/editor.cpp
+  src/ui/response_view.cpp
   src/networking/curl_http_client.cpp
   src/storage/state_store.cpp
   src/app/application.cpp

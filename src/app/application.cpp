@@ -34,7 +34,7 @@ Application::Application() {
 
     lazy_rester::AppStatePtr state = lazy_rester::StateStore().loadStateFromFile();
     std::shared_ptr<FileLogger> logger = result.get();
-    auto main_view = std::make_shared<MainView>(state, logger);
+    MainView main_view(state, logger);
 
     curl_global_cleanup();
 }

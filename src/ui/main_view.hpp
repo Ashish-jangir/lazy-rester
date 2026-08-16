@@ -1,7 +1,7 @@
 #include "../logger/file_logger.hpp"
 #include "../networking/curl_http_client.hpp"
 #include "app_state.hpp"
-#include "request_list.hpp"
+#include "request_explorer.hpp"
 #include <ftxui/component/app.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_options.hpp>
