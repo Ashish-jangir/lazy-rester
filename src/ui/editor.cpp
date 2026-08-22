@@ -46,22 +46,18 @@ ftxui::Component Editor::component() {
     Component container_request =
         Container::Vertical({container_first_request_line, tab_toggle, tab_container});
 
-    Component renderer_request = Renderer(container_request, [http_method_dropdown, url_input,
-                                                              tab_toggle, send_button,
-                                                              tab_container] {
-        return vbox(
-            {hbox({http_method_dropdown->Render(),
-                   url_input->Render() | border | bgcolor(Color::Black), send_button->Render()}),
-             separatorEmpty(), tab_toggle->Render(),
-             // headers_input->Render() | flex | border,
-             //          body_input->Render()}) |
-             //    flex | border;
-             separatorEmpty(), tab_container->Render() | flex | border | bgcolor(Color::Black)});
-    });
+    Component renderer_request =
+        Renderer(container_request,
+                 [http_method_dropdown, url_input, tab_toggle, send_button, tab_container] {
+                     return vbox({hbox({http_method_dropdown->Render(),
+                                        url_input->Render() | border | bgcolor(Color::Black),
+                                        send_button->Render()}),
+                                  separatorEmpty(), tab_toggle->Render(), separatorEmpty(),
+                                  tab_container->Render() | flex | border | bgcolor(Color::Black)});
+                 });
 
     renderer_request = ResizableSplitBottom(Renderer([this]() { return response_; }),
                                             renderer_request, &main_request_area_size_);
-    // return Renderer(renderer_request, [renderer_request] { return renderer_request->Render(); });
 
     Component editor_component =
         Renderer(renderer_request, [renderer_request] { return renderer_request->Render(); });
@@ -79,23 +75,13 @@ void Editor::updateEditor(int selected_request_index) {
     logger_->info("Updating Editor with request index: " + request.toString());
     request_ = request;
     http_method_selected_ = static_cast<int>(request.method_);
-    for (const auto &header : request.headers_) {
-        headers_ += header.first + ": " + header.second + "\n";
-    }
+    headers_ = request.getHeadersAsString();
 }
 
 void Editor::saveRequestToDatabase() {
     HttpRequest request = request_;
     request.method_ = static_cast<HttpMethod>(http_method_selected_);
-    // parse new line seprated headers from string to map
-    std::map<std::string, std::string> headers_map;
-    std::istringstream headers_stream(headers_);
-    std::string header_line;
-    while (std::getline(headers_stream, header_line)) {
-        auto [key, value] = lazy_rester::Utility::parseHeaderLine(header_line);
-        headers_map[key] = value;
-    }
-    request.headers_ = headers_map;
+    request.setHeadersFromString(headers_);
     logger_->info("Saving Request to Database: " + request.toString());
     db_->saveRequest(request);
 }
@@ -107,15 +93,7 @@ void Editor::send() {
         HttpRequest request = request_;
         request.method_ = static_cast<HttpMethod>(http_method_selected_);
         logger_->info("Headers: " + headers_);
-        // parse new line seprated headers from string to map
-        std::map<std::string, std::string> headers_map;
-        std::istringstream headers_stream(headers_);
-        std::string header_line;
-        while (std::getline(headers_stream, header_line)) {
-            auto [key, value] = lazy_rester::Utility::parseHeaderLine(header_line);
-            headers_map[key] = value;
-        }
-        request.headers_ = headers_map;
+        request.setHeadersFromString(headers_);
         auto response_text = client_->sendRequest(request);
         response_ = ftxui::text(response_text.body) | ftxui::border;
         // app.PostEvent(Event::Custom);

@@ -108,21 +108,22 @@ int DatabaseStore::saveRequest(HttpRequest request) {
 
         sqlite3_prepare_v2(db_,
                            "UPDATE requests SET folder_id = ?, url = ?, method = ?, body = ?, "
-                           "label_name = ? WHERE id = ?",
+                           "label_name = ?, headers = ? WHERE id = ?",
                            -1, &stmt, nullptr);
-        sqlite3_bind_int(stmt, 6, request.id_);
+        sqlite3_bind_int(stmt, 7, request.id_);
     } else {
 
-        sqlite3_prepare_v2(
-            db_,
-            "INSERT INTO requests (folder_id, url, method, body, label_name) VALUES (?, ?, ?, ?)",
-            -1, &stmt, nullptr);
+        sqlite3_prepare_v2(db_,
+                           "INSERT INTO requests (folder_id, url, method, body, label_name, "
+                           "headers) VALUES (?, ?, ?, ?, ?)",
+                           -1, &stmt, nullptr);
     }
     sqlite3_bind_int(stmt, 1, static_cast<int>(request.folder_id_));
     sqlite3_bind_text(stmt, 2, request.url_.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 3, static_cast<int>(request.method_));
     sqlite3_bind_text(stmt, 4, request.body_.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 5, request.label_name_.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 6, request.getHeadersAsString().c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_step(stmt);
     int id = request.id_ > 0 ? request.id_ : static_cast<int>(sqlite3_last_insert_rowid(db_));
     sqlite3_finalize(stmt);

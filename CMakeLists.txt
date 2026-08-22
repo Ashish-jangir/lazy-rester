@@ -17,6 +17,7 @@ add_executable(
   src/ui/editor.cpp
   src/ui/response_view.cpp
   src/networking/curl_http_client.cpp
+  src/networking/http_request.cpp
   src/storage/state_store.cpp
   src/storage/database_store.cpp
   src/app/application.cpp
