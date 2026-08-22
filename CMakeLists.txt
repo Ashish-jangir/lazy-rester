@@ -2,14 +2,10 @@ cmake_minimum_required(VERSION 4.3.2)
 project(
     LazyRESTer
   VERSION 0.1
-  LANGUAGES CXX
+  LANGUAGES C CXX
+  # since sqlite3 is a c library it requires c compiler to compile.
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-# Log C++ Compiler information
-message("C++ Compiler: ${CMAKE_CXX_COMPILER}")
-message("C++ Compiler Id: ${CMAKE_CXX_COMPILER_ID}")
-message("C++ Compiler Version: ${CMAKE_CXX_COMPILER_VERSION}")
-
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -22,6 +18,7 @@ add_executable(
   src/ui/response_view.cpp
   src/networking/curl_http_client.cpp
   src/storage/state_store.cpp
+  src/storage/database_store.cpp
   src/app/application.cpp
   src/logger/file_logger.cpp
   src/utils/utility.cpp
@@ -65,12 +62,26 @@ FetchContent_Declare(
     GIT_TAG v3.12.0
 )
 FetchContent_MakeAvailable(json)
+
+FetchContent_Declare(
+    sqlite3
+    URL https://www.sqlite.org/2026/sqlite-amalgamation-3530400.zip
+)
+FetchContent_MakeAvailable(sqlite3)
+# sqlite amalgamation is a single c file, so we can just compile it as a
+# static library and link it to our project.
+add_library(sqlite3_lib STATIC ${sqlite3_SOURCE_DIR}/sqlite3.c)
+target_include_directories(sqlite3_lib PUBLIC ${sqlite3_SOURCE_DIR})
+#  sqlite3 is a thread-safe library, but we need to define
+#  SQLITE_THREADSAFE=1 to enable it.
+target_compile_definitions(sqlite3_lib PRIVATE SQLITE_THREADSAFE=1)
 target_link_libraries(
     LazyRESTer
   PRIVATE
   CURL::libcurl
   ftxui::ftxui
   nlohmann_json::nlohmann_json
+  sqlite3_lib
 )
 # Only should be used in development
 target_compile_options(

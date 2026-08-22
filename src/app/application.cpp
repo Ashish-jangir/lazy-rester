@@ -5,7 +5,7 @@
 #include <iostream>
 #include <memory>
 Application::Application() {
-    using lazy_rester::MainView;
+    using namespace lazy_rester;
     using std::make_shared;
 
     CURLcode curl_result = curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -31,10 +31,10 @@ Application::Application() {
     // app_state.selected_request_index_ = 1;
     // app_state.dirty_ = true;
     // lazy_rester::StateStore().saveStateToFile(std::make_shared<lazy_rester::AppState>(app_state));
-
-    lazy_rester::AppStatePtr state = lazy_rester::StateStore().loadStateFromFile();
+    std::shared_ptr<DatabaseStore> db = std::make_shared<DatabaseStore>();
+    AppStatePtr state = db->loadState();
     std::shared_ptr<FileLogger> logger = result.get();
-    MainView main_view(state, logger);
+    MainView main_view(state, db, logger);
 
     curl_global_cleanup();
 }

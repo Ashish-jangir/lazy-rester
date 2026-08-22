@@ -9,13 +9,13 @@
 #include <memory>
 using namespace ftxui;
 
-lazy_rester::MainView::MainView(AppStatePtr state, std::shared_ptr<FileLogger> logger)
-    : logger_(logger) {
+lazy_rester::MainView::MainView(AppStatePtr state, std::shared_ptr<DatabaseStore> db,
+                                std::shared_ptr<FileLogger> logger)
+    : logger_(logger), db_(db) {
     client_ = std::make_shared<CurlHttpClient>(logger_);
     App screen = App::Fullscreen();
-    std::shared_ptr<Editor> editor = std::make_shared<Editor>(state, logger_, client_);
-    int selected_request_index = 0;
-    RequestExplorer request_explorer(state, selected_request_index, editor);
+    std::shared_ptr<Editor> editor = std::make_shared<Editor>(state, db_, logger_, client_);
+    RequestExplorer request_explorer(state, editor);
 
     int left_size = 20;
 

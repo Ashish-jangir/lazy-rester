@@ -32,6 +32,9 @@ lazy_rester::CurlHttpClient::sendRequest(lazy_rester::HttpRequest &request) {
     if (curl) {
         curl_easy_cleanup(curl);
     }
+    if (list) {
+        curl_slist_free_all(list);
+    }
     return http_response;
 }
 size_t lazy_rester::CurlHttpClient::writeCallback(void *contents, size_t size, size_t nmemb,

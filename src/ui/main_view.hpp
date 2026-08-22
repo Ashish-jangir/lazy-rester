@@ -1,5 +1,6 @@
 #include "../logger/file_logger.hpp"
 #include "../networking/curl_http_client.hpp"
+#include "../storage/database_store.hpp"
 #include "app_state.hpp"
 #include "request_explorer.hpp"
 #include <ftxui/component/app.hpp>
@@ -21,6 +22,7 @@ class MainView {
   private:
     std::shared_ptr<CurlHttpClient> client_;
     std::shared_ptr<FileLogger> logger_;
+    std::shared_ptr<DatabaseStore> db_;
 
   public:
     /**
@@ -31,6 +33,7 @@ class MainView {
      *
      * @return it returns nothing
      */
-    MainView(AppStatePtr state, std::shared_ptr<FileLogger> logger);
+    MainView(AppStatePtr state, std::shared_ptr<DatabaseStore> db,
+             std::shared_ptr<FileLogger> logger);
 };
 } // namespace lazy_rester

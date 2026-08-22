@@ -1,4 +1,5 @@
 #pragma once
+#include "folder.hpp"
 #include <lazy_rester/http_request.hpp>
 #include <memory>
 #include <vector>
@@ -13,7 +14,9 @@ namespace lazy_rester {
 class AppState {
   public:
     std::vector<HttpRequest> requests_;
+    std::vector<Folder> folders_;
     int selected_request_index_ = -1;
+    int selected_folder_id_ = -1;
     HttpRequest current_open_request_;
     bool dirty_ = false;
 };
