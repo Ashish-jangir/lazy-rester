@@ -68,7 +68,28 @@ AppStatePtr DatabaseStore::loadState() {
     return state;
 }
 
-void DatabaseStore::createFolder(std::string name, int parent_id) {}
+int DatabaseStore::saveFolder(Folder folder) {
+    sqlite3_stmt *stmt;
+    if (folder.id > 0) {
+
+        sqlite3_prepare_v2(
+            db_, "UPDATE folders SET name = ?, parent_id = ?, sort_order = ? WHERE id = ?", -1,
+            &stmt, nullptr);
+        sqlite3_bind_int(stmt, 4, folder.id);
+    } else {
+
+        sqlite3_prepare_v2(db_,
+                           "INSERT INTO requests (name, parent_id, sort_order) VALUES (?, ?, ?)",
+                           -1, &stmt, nullptr);
+    }
+    sqlite3_bind_text(stmt, 1, folder.name.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, 2, static_cast<int>(folder.parent_id));
+    sqlite3_bind_int(stmt, 3, static_cast<int>(folder.sort_order));
+    sqlite3_step(stmt);
+    int id = folder.id > 0 ? folder.id : static_cast<int>(sqlite3_last_insert_rowid(db_));
+    sqlite3_finalize(stmt);
+    return id;
+}
 void DatabaseStore::renameFolder(int id, std::string name) {}
 void DatabaseStore::deleteFolder(int id) {}
 HttpRequest DatabaseStore::getRequest(int id) {

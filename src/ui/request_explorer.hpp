@@ -20,7 +20,6 @@ class RequestExplorer {
     ftxui::Component component();
 
   private:
-    ftxui::Component empty();
     ftxui::Component getChildern(int folder_id);
     std::map<int, FolderMenuState> folder_states_; // folder id -> state
     std::vector<std::string> entries_;

@@ -14,7 +14,7 @@ class DatabaseStore {
     DatabaseStore();
     void saveState(const AppStatePtr &state);
     AppStatePtr loadState();
-    void createFolder(std::string name, int parent_id);
+    int saveFolder(Folder folder);
     void renameFolder(int id, std::string name);
     void deleteFolder(int id);
 

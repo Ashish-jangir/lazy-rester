@@ -20,6 +20,7 @@ add_executable(
   src/networking/http_request.cpp
   src/storage/state_store.cpp
   src/storage/database_store.cpp
+  src/import/importer.cpp
   src/app/application.cpp
   src/logger/file_logger.cpp
   src/utils/utility.cpp

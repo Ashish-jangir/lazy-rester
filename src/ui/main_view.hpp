@@ -2,6 +2,7 @@
 #include "../networking/curl_http_client.hpp"
 #include "../storage/database_store.hpp"
 #include "app_state.hpp"
+#include "dialog_manager.hpp"
 #include "request_explorer.hpp"
 #include <ftxui/component/app.hpp>
 #include <ftxui/component/component.hpp>
@@ -35,5 +36,6 @@ class MainView {
      */
     MainView(AppStatePtr state, std::shared_ptr<DatabaseStore> db,
              std::shared_ptr<FileLogger> logger);
+    ftxui::Component filePickerDialog(std::shared_ptr<DialogManager>);
 };
 } // namespace lazy_rester
