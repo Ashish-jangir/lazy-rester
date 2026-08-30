@@ -24,6 +24,7 @@ class MainView {
     std::shared_ptr<CurlHttpClient> client_;
     std::shared_ptr<FileLogger> logger_;
     std::shared_ptr<DatabaseStore> db_;
+    std::shared_ptr<RequestExplorer> explorer_;
 
   public:
     /**
@@ -36,6 +37,6 @@ class MainView {
      */
     MainView(AppStatePtr state, std::shared_ptr<DatabaseStore> db,
              std::shared_ptr<FileLogger> logger);
-    ftxui::Component filePickerDialog(std::shared_ptr<DialogManager>);
+    ftxui::Component filePickerDialog(std::shared_ptr<DialogManager>, AppStatePtr state);
 };
 } // namespace lazy_rester

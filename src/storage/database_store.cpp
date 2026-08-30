@@ -79,13 +79,16 @@ int DatabaseStore::saveFolder(Folder folder) {
     } else {
 
         sqlite3_prepare_v2(db_,
-                           "INSERT INTO requests (name, parent_id, sort_order) VALUES (?, ?, ?)",
-                           -1, &stmt, nullptr);
+                           "INSERT INTO folders (name, parent_id, sort_order) VALUES (?, ?, ?)", -1,
+                           &stmt, nullptr);
     }
     sqlite3_bind_text(stmt, 1, folder.name.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 2, static_cast<int>(folder.parent_id));
     sqlite3_bind_int(stmt, 3, static_cast<int>(folder.sort_order));
-    sqlite3_step(stmt);
+    int result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        throw(*sqlite3_errmsg(db_));
+    }
     int id = folder.id > 0 ? folder.id : static_cast<int>(sqlite3_last_insert_rowid(db_));
     sqlite3_finalize(stmt);
     return id;
@@ -136,7 +139,7 @@ int DatabaseStore::saveRequest(HttpRequest request) {
 
         sqlite3_prepare_v2(db_,
                            "INSERT INTO requests (folder_id, url, method, body, label_name, "
-                           "headers) VALUES (?, ?, ?, ?, ?)",
+                           "headers) VALUES (?, ?, ?, ?, ?, ?)",
                            -1, &stmt, nullptr);
     }
     sqlite3_bind_int(stmt, 1, static_cast<int>(request.folder_id_));
@@ -145,7 +148,10 @@ int DatabaseStore::saveRequest(HttpRequest request) {
     sqlite3_bind_text(stmt, 4, request.body_.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 5, request.label_name_.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 6, request.getHeadersAsString().c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_step(stmt);
+    int result = sqlite3_step(stmt);
+    if (result != SQLITE_DONE) {
+        throw(*sqlite3_errmsg(db_));
+    }
     int id = request.id_ > 0 ? request.id_ : static_cast<int>(sqlite3_last_insert_rowid(db_));
     sqlite3_finalize(stmt);
     return id;

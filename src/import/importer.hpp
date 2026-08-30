@@ -10,6 +10,6 @@ class Importer {
 
   public:
     Importer(std::shared_ptr<DatabaseStore> db, std::shared_ptr<FileLogger> logger);
-    void postmanCollectionImport(const std::string &file_path);
+    void postmanCollectionImport(const std::string &file_path, AppStatePtr state);
 };
 } // namespace lazy_rester

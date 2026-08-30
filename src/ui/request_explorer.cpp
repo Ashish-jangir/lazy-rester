@@ -6,22 +6,45 @@
 #include <memory>
 #include <variant>
 namespace lazy_rester {
-RequestExplorer::RequestExplorer(AppStatePtr state, std::shared_ptr<Editor> editor)
-    : editor_(editor), state_(state) {
+class ExplorerRoot : public ftxui::ComponentBase {
+  public:
+    explicit ExplorerRoot(ftxui::Component root) : root_(std::move(root)) {}
 
+    ftxui::Element Render() { return root_->Render(); }
+
+    void setRoot(ftxui::Component root) { root_ = std::move(root); }
+
+    bool OnEvent(ftxui::Event event) override {
+        if (root_->OnEvent(event))
+            return true;
+        return root_->OnEvent(event);
+    }
+
+  private:
+    ftxui::Component root_;
+};
+RequestExplorer::RequestExplorer(AppStatePtr state, std::shared_ptr<Editor> editor)
+    : editor_(editor), state_(state) {}
+
+void RequestExplorer::rebuild() {
+    request_map_.clear();
     for (const Folder &folder : state_->folders_) {
         request_map_[folder.parent_id].push_back(folder);
     }
     for (const HttpRequest &request : state_->requests_) {
         request_map_[request.folder_id_].push_back(request);
     }
+    folder_states_.clear();
+    root_ = getChildern(0);
 }
-
 ftxui::Component RequestExplorer::component() {
-    using namespace ftxui;
-    Component collection_container = getChildern(0);
-    return Renderer(collection_container,
-                    [collection_container] { return collection_container->Render(); });
+    rebuild();
+    root_wrapper_ = std::make_shared<ExplorerRoot>(root_);
+    return Renderer(root_wrapper_, [this] { return root_wrapper_->Render(); });
+}
+void RequestExplorer::refresh() {
+    rebuild();
+    root_wrapper_->setRoot(root_);
 }
 ftxui::Component RequestExplorer::getChildern(int folder_id) {
     using namespace ftxui;

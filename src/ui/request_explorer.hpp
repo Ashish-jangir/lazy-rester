@@ -14,12 +14,17 @@ struct FolderMenuState {
     std::vector<std::string> entries;
     std::vector<int> db_ids; // parallel vector to entries to store the corresponding database IDs
 };
+class ExplorerRoot;
 class RequestExplorer {
   public:
     RequestExplorer(AppStatePtr state, std::shared_ptr<Editor> editor);
     ftxui::Component component();
+    void refresh();
 
   private:
+    ftxui::Component root_;
+    std::shared_ptr<ExplorerRoot> root_wrapper_;
+    void rebuild();
     ftxui::Component getChildern(int folder_id);
     std::map<int, FolderMenuState> folder_states_; // folder id -> state
     std::vector<std::string> entries_;

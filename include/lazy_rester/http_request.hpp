@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <stdexcept>
 #include <string>
 namespace lazy_rester {
 
@@ -22,6 +23,24 @@ constexpr std::string_view toString(HttpMethod method) {
         return "OPTIONS";
     }
     return "UNKNOWN";
+}
+constexpr HttpMethod httpMethodFromString(const std::string &method_str) {
+    if (method_str == "GET") {
+        return HttpMethod::Get;
+    } else if (method_str == "POST") {
+        return HttpMethod::Post;
+    } else if (method_str == "PUT") {
+        return HttpMethod::Put;
+    } else if (method_str == "PATCH") {
+        return HttpMethod::Patch;
+    } else if (method_str == "DELETE") {
+        return HttpMethod::Delete;
+    } else if (method_str == "HEAD") {
+        return HttpMethod::Head;
+    } else if (method_str == "OPTIONS") {
+        return HttpMethod::Options;
+    }
+    throw std::invalid_argument("Invalid HTTP method string: " + method_str);
 }
 class HttpRequest {
   public:

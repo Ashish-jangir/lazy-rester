@@ -20,11 +20,11 @@ MainView::MainView(AppStatePtr state, std::shared_ptr<DatabaseStore> db,
     App screen = App::Fullscreen();
     std::shared_ptr<DialogManager> dialog = std::make_shared<DialogManager>();
     std::shared_ptr<Editor> editor = std::make_shared<Editor>(state, db_, logger_, client_);
-    RequestExplorer request_explorer(state, editor);
+    explorer_ = std::make_shared<RequestExplorer>(state, editor);
     int left_size = 20;
 
     auto main_window = ResizableSplitLeft(
-        request_explorer.component() | CatchEvent([this, dialog](Event event) {
+        explorer_->component() | CatchEvent([this, dialog](Event event) {
             if (event == Event::CtrlR) {
                 dialog->showInput("Import Postman collection", "json collection file", "~/",
                                   [this](const int input) {
@@ -37,14 +37,14 @@ MainView::MainView(AppStatePtr state, std::shared_ptr<DatabaseStore> db,
         editor->component(), &left_size);
 
     auto renderer = Renderer(main_window, [&] { return main_window->Render() | border; });
-    renderer |= Modal(filePickerDialog(dialog), &dialog->show);
+    renderer |= Modal(filePickerDialog(dialog, state), &dialog->show);
     screen.Loop(renderer);
 }
-Component MainView::filePickerDialog(std::shared_ptr<DialogManager> dialog) {
+Component MainView::filePickerDialog(std::shared_ptr<DialogManager> dialog, AppStatePtr state) {
     auto input_field = Input(&dialog->input_value, &dialog->placeholder) | border;
     MenuOption menu_options;
     menu_options.selected = &dialog->selected_index;
-    menu_options.on_enter = [this, dialog]() {
+    menu_options.on_enter = [this, dialog, state]() {
         logger_->info("Selected index: " + std::to_string(dialog->selected_index));
         int input = dialog->selected_index;
         namespace fs = std::filesystem;
@@ -72,7 +72,8 @@ Component MainView::filePickerDialog(std::shared_ptr<DialogManager> dialog) {
                 dialog->hide();
                 logger_->info("Importing Postman collection from file: " + file_path.string());
                 Importer importer(db_, logger_);
-                importer.postmanCollectionImport(file_path.string());
+                importer.postmanCollectionImport(file_path.string(), state);
+                explorer_->refresh();
             } else if (fs::is_directory(file_path)) {
                 dialog->input_value = file_path.string();
                 dialog->menu_entries.erase(dialog->menu_entries.begin() + 1,
