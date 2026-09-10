@@ -14,7 +14,6 @@ Editor::Editor(AppStatePtr state, std::shared_ptr<DatabaseStore> db,
 
 ftxui::Component Editor::component() {
     using namespace ftxui;
-    response_ = text("response") | border;
     Component url_input = Input(&(request_.url_), "url");
     http_method_entries_ = {"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"};
     Component http_method_dropdown = Dropdown(&http_method_entries_, &http_method_selected_);
@@ -46,7 +45,7 @@ ftxui::Component Editor::component() {
     Component container_request =
         Container::Vertical({container_first_request_line, tab_toggle, tab_container});
 
-    Component renderer_request =
+    Component request_component =
         Renderer(container_request,
                  [http_method_dropdown, url_input, tab_toggle, send_button, tab_container] {
                      return vbox({hbox({http_method_dropdown->Render(),
@@ -55,13 +54,16 @@ ftxui::Component Editor::component() {
                                   separatorEmpty(), tab_toggle->Render(), separatorEmpty(),
                                   tab_container->Render() | flex | border | bgcolor(Color::Black)});
                  });
+    Component response_component = response_.component();
 
-    renderer_request = ResizableSplitBottom(Renderer([this]() { return response_; }),
-                                            renderer_request, &main_request_area_size_);
+    Component renderer_request =
+        ResizableSplitBottom(response_component, request_component, &main_request_area_size_);
 
     Component editor_component =
         Renderer(renderer_request, [renderer_request] { return renderer_request->Render(); });
-    return editor_component | CatchEvent([this](Event event) {
+
+    return editor_component |
+           CatchEvent([this, request_component, response_component](Event event) {
                if (event == Event::CtrlS) {
                    saveRequestToDatabase();
                    return true;
@@ -94,9 +96,11 @@ void Editor::send() {
         request.method_ = static_cast<HttpMethod>(http_method_selected_);
         logger_->info("Headers: " + headers_);
         request.setHeadersFromString(headers_);
-        auto response_text = client_->sendRequest(request);
-        response_ = ftxui::text(response_text.body) | ftxui::border;
-        // app.PostEvent(Event::Custom);
+        std::string body = client_->sendRequest(request).body;
+        ftxui::App::PostEventOrExecute([this, body = std::move(body)]() {
+            response_.updateResponse(body);
+            ftxui::App::Active()->PostEvent(ftxui::Event::Custom);
+        });
     }).detach();
 }
 } // namespace lazy_rester

@@ -22,8 +22,7 @@ MainView::MainView(AppStatePtr state, std::shared_ptr<DatabaseStore> db,
     std::shared_ptr<Editor> editor = std::make_shared<Editor>(state, db_, logger_, client_);
     explorer_ = std::make_shared<RequestExplorer>(state, editor);
     int left_size = 20;
-
-    auto main_window = ResizableSplitLeft(
+    auto left_pane =
         explorer_->component() | CatchEvent([this, dialog](Event event) {
             if (event == Event::CtrlR) {
                 dialog->showInput("Import Postman collection", "json collection file", "~/",
@@ -33,8 +32,10 @@ MainView::MainView(AppStatePtr state, std::shared_ptr<DatabaseStore> db,
                 return true;
             }
             return false;
-        }),
-        editor->component(), &left_size);
+        });
+    auto right_pane = editor->component();
+
+    auto main_window = ResizableSplitLeft(left_pane, right_pane, &left_size);
 
     auto renderer = Renderer(main_window, [&] { return main_window->Render() | border; });
     renderer |= Modal(filePickerDialog(dialog, state), &dialog->show);

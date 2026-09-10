@@ -3,6 +3,7 @@
 #include "../networking/curl_http_client.hpp"
 #include "../storage/database_store.hpp"
 #include "app_state.hpp"
+#include "response_view.hpp"
 #include <ftxui/component/app.hpp>
 #include <ftxui/dom/elements.hpp>
 #include <memory>
@@ -27,7 +28,7 @@ class Editor {
     std::shared_ptr<FileLogger> logger_;
     std::shared_ptr<CurlHttpClient> client_;
     std::shared_ptr<DatabaseStore> db_;
-    ftxui::Element response_;
+    ResponseView response_;
     AppStatePtr state_;
 
     void send();

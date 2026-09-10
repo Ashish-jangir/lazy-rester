@@ -6,28 +6,36 @@
 #include <memory>
 #include <variant>
 namespace lazy_rester {
+// class ExplorerRoot : public ftxui::ComponentBase {
+//   public:
+//     explicit ExplorerRoot(ftxui::Component root) : root_(std::move(root)) {}
+//
+//     ftxui::Element Render() { return root_->Render(); }
+//
+//     void setRoot(ftxui::Component root) { root_ = std::move(root); }
+//
+//     bool OnEvent(ftxui::Event event) override {
+//         if (root_->OnEvent(event))
+//             return true;
+//         return root_->OnEvent(event);
+//     }
+//
+//   private:
+//     ftxui::Component root_;
+// };
 class ExplorerRoot : public ftxui::ComponentBase {
   public:
-    explicit ExplorerRoot(ftxui::Component root) : root_(std::move(root)) {}
+    explicit ExplorerRoot(ftxui::Component root) { Add(std::move(root)); }
 
-    ftxui::Element Render() { return root_->Render(); }
-
-    void setRoot(ftxui::Component root) { root_ = std::move(root); }
-
-    bool OnEvent(ftxui::Event event) override {
-        if (root_->OnEvent(event))
-            return true;
-        return root_->OnEvent(event);
+    void setRoot(ftxui::Component root) {
+        DetachAllChildren();
+        Add(std::move(root));
     }
-
-  private:
-    ftxui::Component root_;
 };
 RequestExplorer::RequestExplorer(AppStatePtr state, std::shared_ptr<Editor> editor)
     : editor_(editor), state_(state) {}
 
 void RequestExplorer::rebuild() {
-    request_map_.clear();
     for (const Folder &folder : state_->folders_) {
         request_map_[folder.parent_id].push_back(folder);
     }
