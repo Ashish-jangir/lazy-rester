@@ -8,7 +8,8 @@ struct DialogManager {
     int selected_index = 0;
     std::string placeholder;
     std::string input_value;
-    std::vector<std::string> menu_entries = {"..", "/home/ashish"};
+    std::vector<std::string> menu_entries = {
+        "..", std::getenv("HOME") ? std::string(std::getenv("HOME")) : "/"};
     std::function<void(const int &)> on_submit;
 
     void showInput(const std::string &title, const std::string &placeholder,

@@ -15,8 +15,9 @@ class Editor {
     ftxui::Component component();
     void updateEditor(int selected_request_index);
 
-  private:
     HttpRequest request_;
+
+  private:
     std::string headers_;
     std::string params_;
     std::string authorization_;

@@ -1,10 +1,10 @@
 #include "app_state.hpp"
-#include "editor.hpp"
 #include "lazy_rester/http_request.hpp"
 #include <ftxui/component/app.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/dom/elements.hpp>
+#include <functional>
 #include <memory>
 #include <variant>
 #include <vector>
@@ -17,7 +17,7 @@ struct FolderMenuState {
 class ExplorerRoot;
 class RequestExplorer {
   public:
-    RequestExplorer(AppStatePtr state, std::shared_ptr<Editor> editor);
+    RequestExplorer(AppStatePtr state, std::function<void(int)> on_request_selected);
     ftxui::Component component();
     void refresh();
 
@@ -30,7 +30,7 @@ class RequestExplorer {
     std::vector<std::string> entries_;
     std::map<int, std::vector<std::variant<Folder, HttpRequest>>> request_map_;
     int selected_request_index_;
-    std::shared_ptr<Editor> editor_;
+    std::function<void(int)> on_request_selected_;
     AppStatePtr state_;
 };
 } // namespace lazy_rester

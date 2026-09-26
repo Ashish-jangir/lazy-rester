@@ -32,8 +32,8 @@ class ExplorerRoot : public ftxui::ComponentBase {
         Add(std::move(root));
     }
 };
-RequestExplorer::RequestExplorer(AppStatePtr state, std::shared_ptr<Editor> editor)
-    : editor_(editor), state_(state) {}
+RequestExplorer::RequestExplorer(AppStatePtr state, std::function<void(int)> on_request_selected)
+    : on_request_selected_(on_request_selected), state_(state) {}
 
 void RequestExplorer::rebuild() {
     for (const Folder &folder : state_->folders_) {
@@ -81,7 +81,7 @@ ftxui::Component RequestExplorer::getChildern(int folder_id) {
     FolderMenuState &fs = folder_states_[folder_id];
     menu_option.on_enter = [&fs, this]() {
         // update the editor with the selected request
-        editor_->updateEditor(fs.db_ids[fs.selected]);
+        on_request_selected_(fs.db_ids[fs.selected]);
     };
     auto menu = Menu(menu_option);
     collection_container->Add(menu);

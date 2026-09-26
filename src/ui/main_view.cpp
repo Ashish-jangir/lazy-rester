@@ -3,6 +3,7 @@
 #include "../utils/utility.hpp"
 #include "dialog_manager.hpp"
 #include "editor.hpp"
+#include <algorithm>
 #include <filesystem>
 #include <ftxui/component/app.hpp>
 #include <ftxui/component/component.hpp>
@@ -15,31 +16,68 @@ using namespace ftxui;
 namespace lazy_rester {
 MainView::MainView(AppStatePtr state, std::shared_ptr<DatabaseStore> db,
                    std::shared_ptr<FileLogger> logger)
-    : logger_(logger), db_(db) {
+    : logger_(logger), db_(db), state_(state) {
     client_ = std::make_shared<CurlHttpClient>(logger_);
     App screen = App::Fullscreen();
     std::shared_ptr<DialogManager> dialog = std::make_shared<DialogManager>();
-    std::shared_ptr<Editor> editor = std::make_shared<Editor>(state, db_, logger_, client_);
-    explorer_ = std::make_shared<RequestExplorer>(state, editor);
+
+    std::vector<std::string> request_tabs = {"New Request"};
+    editors_.emplace_back(state, db_, logger_, client_);
+    editor_components_.push_back(editors_[0].component());
+    auto tab_toggle = Toggle(&request_tabs, &tab_selected_);
+    auto tab_container = Container::Tab(editor_components_, &tab_selected_);
+
+    explorer_ = std::make_shared<RequestExplorer>(
+        state, [this](int request_id) { addEditorTab(request_id); });
     int left_size = 20;
     auto left_pane =
         explorer_->component() | CatchEvent([this, dialog](Event event) {
             if (event == Event::CtrlR) {
-                dialog->showInput("Import Postman collection", "json collection file", "~/",
+                char *home = std::getenv("HOME");
+                std::string home_dir = home ? std::string(home) : "/";
+                dialog->showInput("Import Postman collection", "json collection file", home_dir,
                                   [this](const int input) {
-                                      logger_->info("Here in import collection dialog: " + input);
+                                      logger_->info(&"Here in import collection dialog: "[input]);
                                   });
                 return true;
             }
             return false;
         });
-    auto right_pane = editor->component();
 
-    auto main_window = ResizableSplitLeft(left_pane, right_pane, &left_size);
+    auto container = Container::Vertical({
+        tab_toggle,
+        tab_container,
+    });
+
+    right_pane_ = Renderer(container, [&] {
+        return vbox({
+                   tab_toggle->Render(),
+                   separator(),
+                   tab_container->Render(),
+               }) |
+               border;
+    });
+
+    auto main_window = ResizableSplitLeft(left_pane, right_pane_, &left_size);
 
     auto renderer = Renderer(main_window, [&] { return main_window->Render() | border; });
     renderer |= Modal(filePickerDialog(dialog, state), &dialog->show);
     screen.Loop(renderer);
+}
+void MainView::addEditorTab(int request_id) {
+    std::vector<Editor>::iterator itr =
+        std::find_if(editors_.begin(), editors_.end(), [request_id](const Editor &editor) {
+            return editor.request_.id_ == request_id;
+        });
+    if (itr != editors_.end()) {
+        // Editor already exists, switch to that tab
+        tab_selected_ = std::distance(editors_.begin(), itr);
+    } else {
+        editors_.emplace_back(state_, db_, logger_, client_);
+        editor_components_.push_back(editors_.back().component());
+        editors_.back().updateEditor(request_id);
+        tab_selected_ = editors_.size() - 1;
+    }
 }
 Component MainView::filePickerDialog(std::shared_ptr<DialogManager> dialog, AppStatePtr state) {
     auto input_field = Input(&dialog->input_value, &dialog->placeholder) | border;

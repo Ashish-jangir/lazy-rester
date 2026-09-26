@@ -3,6 +3,7 @@
 #include "../storage/database_store.hpp"
 #include "app_state.hpp"
 #include "dialog_manager.hpp"
+#include "editor.hpp"
 #include "request_explorer.hpp"
 #include <ftxui/component/app.hpp>
 #include <ftxui/component/component.hpp>
@@ -25,6 +26,11 @@ class MainView {
     std::shared_ptr<FileLogger> logger_;
     std::shared_ptr<DatabaseStore> db_;
     std::shared_ptr<RequestExplorer> explorer_;
+    std::vector<Editor> editors_;
+    AppStatePtr state_;
+    ftxui::Component right_pane_;
+    int tab_selected_ = 0;
+    std::vector<ftxui::Component> editor_components_;
 
   public:
     /**
@@ -38,5 +44,6 @@ class MainView {
     MainView(AppStatePtr state, std::shared_ptr<DatabaseStore> db,
              std::shared_ptr<FileLogger> logger);
     ftxui::Component filePickerDialog(std::shared_ptr<DialogManager>, AppStatePtr state);
+    void addEditorTab(int request_id);
 };
 } // namespace lazy_rester
